@@ -42,6 +42,25 @@ public class UserRestImpl implements UserRest {
 
 
 	@Override
+	public ResponseEntity<Map<String, String>> login(Map<String, String> requestMap) {
+		// TODO Auto-generated method stub
+		
+		try
+		{
+			return userservice.login(requestMap);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		return OnlineBankingUtils.getResponseEntity_L(OnlineBankingConstants.Something_Went_Wrong, HttpStatus.INTERNAL_SERVER_ERROR);
+		
+	}
+	
+	
+	
+	/*@Override
 	public ResponseEntity<String> login(Map<String, String> requestMap) {
 		// TODO Auto-generated method stub
 		
@@ -56,7 +75,7 @@ public class UserRestImpl implements UserRest {
 		
 		return OnlineBankingUtils.getResponseEntity(OnlineBankingConstants.Something_Went_Wrong, HttpStatus.INTERNAL_SERVER_ERROR);
 		
-	}
+	}*/
 
 
 	@Override
@@ -64,6 +83,18 @@ public class UserRestImpl implements UserRest {
 		try
 		{
 			return userservice.getAllUser();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		return new ResponseEntity<List<UserWrapper>>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	public ResponseEntity<List<UserWrapper>> getNewUsers() {
+		try
+		{
+			return userservice.getNewUsers();
 		}
 		catch(Exception e)
 		{
@@ -117,6 +148,20 @@ public class UserRestImpl implements UserRest {
 			e.printStackTrace();
 		}
 		return OnlineBankingUtils.getResponseEntity(OnlineBankingConstants.Something_Went_Wrong, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+
+
+	@Override
+	public ResponseEntity<List<UserWrapper>> getExistingUsers() {
+		try
+		{
+			return userservice.getExistingUsers();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		return new ResponseEntity<List<UserWrapper>>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 }

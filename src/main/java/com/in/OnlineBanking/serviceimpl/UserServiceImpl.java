@@ -1,6 +1,7 @@
 package com.in.OnlineBanking.serviceimpl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.in.OnlineBanking.constants.OnlineBankingConstants;
@@ -64,6 +66,7 @@ public class UserServiceImpl implements UserService {
 			User user = userdao.findByEmailId(requestMap.get("email"));
 			if(Objects.isNull(user))
 			{
+
 				userdao.save(getUserFromMap(requestMap));
 				return OnlineBankingUtils.getResponseEntity("Successfully Registered", HttpStatus.OK);
 			}
@@ -101,38 +104,76 @@ public class UserServiceImpl implements UserService {
 	
 	private User getUserFromMap(Map<String, String> requestmap)
 	{
+		BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
+		String encodedPassword = bcrypt.encode(requestmap.get("password"));
+		
 		User user = new User();
 		user.setEmail(requestmap.get("email"));
 		user.setName(requestmap.get("name"));
 		user.setContactNumber(requestmap.get("contactNumber"));
-		user.setPassword(requestmap.get("password"));
+		user.setPassword(encodedPassword);
 		user.setStatus("false");
 		user.setRole("user");
 		return user;
 		
 	}
 
+
+	
+	
+	
+	
 	@Override
-	public ResponseEntity<String> login(Map<String, String> requestMap) {
+	public ResponseEntity<Map<String, String>> login(Map<String, String> requestMap) {
 		// TODO Auto-generated method stub
 		
 		log.info("Inside Login");
 		
 		try
 		{
+			BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
+			User opUser = userdao.findByEmailId(requestMap.get("email"));
 			Authentication auth = authenticationmanager.authenticate
-													(new UsernamePasswordAuthenticationToken(requestMap.get("email"), requestMap.get("password")));
-		if(auth.isAuthenticated())
+													(new UsernamePasswordAuthenticationToken(requestMap.get("email"),opUser.getPassword()));
+			
+			
+			
+		if(bcrypt.matches(requestMap.get("password"), opUser.getPassword()))
 		{
+			log.info("Inside Login authenticated");
+			log.info("Inside Login "+ customeruserdetailsservice.getUserDetail().getStatus() );
+			
 			if(customeruserdetailsservice.getUserDetail().getStatus().equalsIgnoreCase("true"))
 			{
-				return new ResponseEntity<String>("{\"token\":\""+
-			jwtutil.generateToken(customeruserdetailsservice.getUserDetail().getEmail(), 
-					customeruserdetailsservice.getUserDetail().getRole())+"\"}", HttpStatus.OK);
+				
+				
+				Map<String, String> loginResponse = new HashMap<>();
+				
+				String jwtToken = jwtutil.generateToken(customeruserdetailsservice.getUserDetail().getEmail(), 
+						customeruserdetailsservice.getUserDetail().getRole());
+				String name = customeruserdetailsservice.getUserDetail().getName();
+				String mail = customeruserdetailsservice.getUserDetail().getEmail();
+				String contactNumber = customeruserdetailsservice.getUserDetail().getContactNumber();
+				String role = customeruserdetailsservice.getUserDetail().getRole();
+				String isAdmin = (role.equalsIgnoreCase("admin")) ? "True" : "";
+	
+				System.out.println(isAdmin);
+				
+				
+				
+				loginResponse.put("token", jwtToken);
+				loginResponse.put("name", name);
+				loginResponse.put("mail", mail);
+				loginResponse.put("contactNumber", contactNumber);
+				loginResponse.put("isAdmin", isAdmin);
+				
+				return new ResponseEntity<Map<String, String>>(loginResponse, HttpStatus.OK);
+		
 			}
 			else
 			{
-				return new ResponseEntity<String> ("{\"message\":\""+"wait for admin approval. "+"\"}", HttpStatus.BAD_REQUEST);
+				
+				return OnlineBankingUtils.getResponseEntity_L("wait for admin approval. ", HttpStatus.BAD_REQUEST);
 			}
 						
 		}
@@ -141,8 +182,10 @@ public class UserServiceImpl implements UserService {
 		{
 			log.error("{}", e);
 		}
-		return new ResponseEntity<String> ("{\"message\":\""+"Bad Credentials. "+"\"}", HttpStatus.BAD_REQUEST);
+
+		return OnlineBankingUtils.getResponseEntity_L("Bad Credentials", HttpStatus.BAD_REQUEST);
 	}
+	
 
 	@Override
 	public ResponseEntity<List<UserWrapper>> getAllUser() {
@@ -153,6 +196,28 @@ public class UserServiceImpl implements UserService {
 			{
 				System.out.println("Helllll");
 				return new ResponseEntity<List<UserWrapper>>(userdao.getAllUser(), HttpStatus.OK);
+			}
+			else
+			{
+				return new ResponseEntity<>(new ArrayList<>(), HttpStatus.UNAUTHORIZED);
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
+	} 
+	
+	@Override
+	public ResponseEntity<List<UserWrapper>> getNewUsers() {
+		// TODO Auto-generated method stub
+		try
+		{
+			if(jwtfilter.isAdmin())
+			{
+				return new ResponseEntity<List<UserWrapper>>(userdao.getNewUsers(), HttpStatus.OK);
 			}
 			else
 			{
@@ -230,6 +295,27 @@ public class UserServiceImpl implements UserService {
 		}
 		return OnlineBankingUtils.getResponseEntity(OnlineBankingConstants.Something_Went_Wrong, HttpStatus.INTERNAL_SERVER_ERROR);
 	
+	}
+
+	@Override
+	public ResponseEntity<List<UserWrapper>> getExistingUsers() {
+		try
+		{
+			if(jwtfilter.isAdmin())
+			{
+				return new ResponseEntity<List<UserWrapper>>(userdao.getExistingUsers(), HttpStatus.OK);
+			}
+			else
+			{
+				return new ResponseEntity<>(new ArrayList<>(), HttpStatus.UNAUTHORIZED);
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 	

@@ -23,6 +23,12 @@ import lombok.Data;
 
 @NamedQuery(name = "User.getAllAdmin" , query = "select u.email from User u where u.role='admin'")
 
+@NamedQuery(name = "User.getNewUsers" , query = "select new com.in.OnlineBanking.wrapper.UserWrapper(u.id,u.name, u.email, u.contactNumber, u.status ) from User u where u.status='false'")
+
+@NamedQuery(name = "User.getExistingUsers" , query = "select new com.in.OnlineBanking.wrapper.UserWrapper(u.id,u.name, u.email, u.contactNumber, u.status ) from User u where u.status='true'")
+
+
+
 
 @Data
 @Entity
