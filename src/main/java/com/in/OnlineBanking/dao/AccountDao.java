@@ -27,7 +27,7 @@ public interface AccountDao extends JpaRepository<Account, Integer>
 	Account findAllByCustomerMailAndAccountTypeAndBalance(@Param("customer_mail") String customer_mail, @Param("account_type") String  account_type, @Param("customer_mail") long balance);
 	
 	
-	List<Account> findAllByisRequested(boolean isRequested);
+	List<Account> findAllByIsChequeBookAvailableAndIsRequested(boolean isChequeBookAvailable, boolean isRequested);
 	
 	
 }

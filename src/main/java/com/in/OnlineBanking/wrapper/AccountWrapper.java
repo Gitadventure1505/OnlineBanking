@@ -28,6 +28,9 @@ public class AccountWrapper {
 	private boolean isRequested;
 	
 	
+	private long chequeBookNumber;
+	
+	
 
 
 	public AccountWrapper() {
@@ -39,7 +42,7 @@ public class AccountWrapper {
 
 
 	public AccountWrapper(Integer id, String account_type, String customer_mail, long account_no, long balance,
-			boolean isChequeBookAvailable, boolean isRequested) {
+			boolean isChequeBookAvailable, boolean isRequested, long chequeBookNumber) {
 		super();
 		this.id = id;
 		this.account_type = account_type;
@@ -48,6 +51,7 @@ public class AccountWrapper {
 		this.balance = balance;
 		this.isChequeBookAvailable = isChequeBookAvailable;
 		this.isRequested = isRequested;
+		this.chequeBookNumber = chequeBookNumber;
 	}
 
 
@@ -163,6 +167,22 @@ public class AccountWrapper {
 
 	public void setRequested(boolean isRequested) {
 		this.isRequested = isRequested;
+	}
+
+
+
+
+
+	public long getChequeBookNumber() {
+		return chequeBookNumber;
+	}
+
+
+
+
+
+	public void setChequeBookNumber(long chequeBookNumber) {
+		this.chequeBookNumber = chequeBookNumber;
 	}
 
 	

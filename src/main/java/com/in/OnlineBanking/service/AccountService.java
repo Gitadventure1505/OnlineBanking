@@ -33,6 +33,10 @@ public interface AccountService {
 	
 	
 	ResponseEntity<List<Account>> getAccountsByIsRequested();
+	
+	ResponseEntity<String> generateChequeBookForAccount(long accountNum);
+
+	ResponseEntity<String> requestForChequeBook(long accountNum);
 
 	
 	

@@ -2,6 +2,7 @@ package com.in.OnlineBanking.pojo;
 
 import java.io.Serializable;
 
+import javax.annotation.Nullable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -58,6 +59,11 @@ public class Account implements Serializable {
 	
 	@Column(name = "isRequested")
 	private boolean isRequested;
+	
+	
+	
+	@Column(name = "chequebooknumber")
+	private long chequeBookNumber;
 
 	
 	
@@ -71,7 +77,7 @@ public class Account implements Serializable {
 
 
 	public Account(Integer id, String accountType, String customerMail, long accountNo, long balance,
-			boolean isChequeBookAvailable, boolean isRequested) {
+			boolean isChequeBookAvailable, boolean isRequested,long chequeBookNumber) {
 		super();
 		this.id = id;
 		this.accountType = accountType;
@@ -80,6 +86,7 @@ public class Account implements Serializable {
 		this.balance = balance;
 		this.isChequeBookAvailable = isChequeBookAvailable;
 		this.isRequested = isRequested;
+		this.chequeBookNumber = chequeBookNumber;
 	}
 
 
@@ -179,7 +186,7 @@ public class Account implements Serializable {
 
 
 
-	public boolean isRequested() {
+	public boolean getIsRequested() {
 		return isRequested;
 	}
 
@@ -187,15 +194,30 @@ public class Account implements Serializable {
 
 
 
-	public void setRequested(boolean isRequested) {
+	public void setIsRequested(boolean isRequested) {
 		this.isRequested = isRequested;
 	}
 
 
+
+
 	
+	public long getChequeBookNumber() {
+		return chequeBookNumber;
+	}
+
+
+
+
 	
-	
-	
+	public void setChequeBookNumber(long chequeBookNumber) {
+		this.chequeBookNumber = chequeBookNumber;
+	}
+
+
+
+
+
 
 	
 }

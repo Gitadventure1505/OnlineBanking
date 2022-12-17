@@ -262,7 +262,7 @@ public class AccountServiceImpl implements AccountService {
 					receiverPrimaryAccount.setCustomermail(receiverAccount.getCustomerMail());
 					receiverPrimaryAccount.setFromaccount(saveTransaction.getFromaccount());
 					receiverPrimaryAccount.setToaccount(saveTransaction.getToaccount());
-					receiverPrimaryAccount.setTransactiontype("credited from AccountNum "+ saveTransaction.getFromaccount() +"and his/her Mail id is "+saveTransaction.getCustomermail());
+					receiverPrimaryAccount.setTransactiontype("credited from AccountNum "+ saveTransaction.getFromaccount() +" and his/her Mail id is "+saveTransaction.getCustomermail());
 					receiverPrimaryAccount.setBalance(receiverBalance);
 					receiverPrimaryAccount.setTransferamount(saveTransaction.getTransferamount());
 					primaryAccountDao.save(receiverPrimaryAccount);
@@ -277,7 +277,7 @@ public class AccountServiceImpl implements AccountService {
 						receiverSavingsAccount.setCustomermail(receiverAccount.getCustomerMail());
 						receiverSavingsAccount.setFromaccount(saveTransaction.getFromaccount());
 						receiverSavingsAccount.setToaccount(saveTransaction.getToaccount());
-						receiverSavingsAccount.setTransactiontype("credited from AccountNum "+ saveTransaction.getFromaccount() +"and his/her Mail id is "+saveTransaction.getCustomermail() );
+						receiverSavingsAccount.setTransactiontype("credited from AccountNum "+ saveTransaction.getFromaccount() +" and his/her Mail id is "+saveTransaction.getCustomermail() );
 						receiverSavingsAccount.setTransferamount(saveTransaction.getTransferamount());
 						receiverSavingsAccount.setBalance(receiverBalance);
 						savingsAccountDao.save(receiverSavingsAccount);
@@ -300,7 +300,7 @@ public class AccountServiceImpl implements AccountService {
 			}
 			else
 			{
-				return OnlineBankingUtils.getResponseEntity("Insufficient balance to make this transaction", HttpStatus.EXPECTATION_FAILED);
+				return OnlineBankingUtils.getResponseEntity("Insufficient balance to make this transaction",  HttpStatus.OK);
 			}
 				
 			}else if(primaryAccount.getTransactiontype().equalsIgnoreCase("withdraw"))
@@ -327,7 +327,7 @@ public class AccountServiceImpl implements AccountService {
 				}
 				else
 				{
-					return OnlineBankingUtils.getResponseEntity("Insufficient balance to make this transaction", HttpStatus.EXPECTATION_FAILED);
+					return OnlineBankingUtils.getResponseEntity("Insufficient balance to make this transaction", HttpStatus.OK);
 				}
 				
 			}else
@@ -452,7 +452,7 @@ public class AccountServiceImpl implements AccountService {
 					receiverSavingsAccount.setCustomermail(receiverAccount.getCustomerMail());
 					receiverSavingsAccount.setFromaccount(saveTransaction.getFromaccount());
 					receiverSavingsAccount.setToaccount(saveTransaction.getToaccount());
-					receiverSavingsAccount.setTransactiontype("credited from AccountNum "+ saveTransaction.getFromaccount() +"and his/her Mail id is "+saveTransaction.getCustomermail());
+					receiverSavingsAccount.setTransactiontype("credited from AccountNum "+ saveTransaction.getFromaccount() +" and his/her Mail id is "+saveTransaction.getCustomermail());
 					receiverSavingsAccount.setBalance(receiverBalance);
 					receiverSavingsAccount.setTransferamount(saveTransaction.getTransferamount());
 					savingsAccountDao.save(receiverSavingsAccount);
@@ -467,7 +467,7 @@ public class AccountServiceImpl implements AccountService {
 						receiverprimaryAccount.setCustomermail(receiverAccount.getCustomerMail());
 						receiverprimaryAccount.setFromaccount(saveTransaction.getFromaccount());
 						receiverprimaryAccount.setToaccount(saveTransaction.getToaccount());
-						receiverprimaryAccount.setTransactiontype("credited from AccountNum "+ saveTransaction.getFromaccount() +"and his/her Mail id is "+saveTransaction.getCustomermail() );
+						receiverprimaryAccount.setTransactiontype("credited from AccountNum "+ saveTransaction.getFromaccount() +" and his/her Mail id is "+saveTransaction.getCustomermail() );
 						receiverprimaryAccount.setTransferamount(saveTransaction.getTransferamount());
 						receiverprimaryAccount.setBalance(receiverBalance);
 						primaryAccountDao.save(receiverprimaryAccount);
@@ -490,7 +490,7 @@ public class AccountServiceImpl implements AccountService {
 			}
 			else
 			{
-				return OnlineBankingUtils.getResponseEntity("Insufficient balance to make this transaction", HttpStatus.EXPECTATION_FAILED);
+				return OnlineBankingUtils.getResponseEntity("Insufficient balance to make this transaction", HttpStatus.OK);
 			}
 				
 			}else if(savingsAccount.getTransactiontype().equalsIgnoreCase("withdraw"))
@@ -517,7 +517,7 @@ public class AccountServiceImpl implements AccountService {
 				}
 				else
 				{
-					return OnlineBankingUtils.getResponseEntity("Insufficient balance to make this transaction", HttpStatus.EXPECTATION_FAILED);
+					return OnlineBankingUtils.getResponseEntity("Insufficient balance to make this transaction", HttpStatus.OK);
 				}
 				
 			}else
@@ -619,8 +619,8 @@ public class AccountServiceImpl implements AccountService {
 	public ResponseEntity<List<Account>> getAccountsByIsRequested() {
 		
 		try {
-			  List<Account> AccountsRequested =   accountDao.findAllByisRequested(true);
-			  return new ResponseEntity<>(new ArrayList(), HttpStatus.OK);
+			  List<Account> AccountsRequested =   accountDao.findAllByIsChequeBookAvailableAndIsRequested(false, true);
+			  return new ResponseEntity<>(AccountsRequested, HttpStatus.OK);
 		}
 		catch(Exception e)
 		{
@@ -630,6 +630,59 @@ public class AccountServiceImpl implements AccountService {
 		
 		return new ResponseEntity<>(new ArrayList(), HttpStatus.INTERNAL_SERVER_ERROR);
 		
+		
+	}
+
+
+
+	@Override
+	public ResponseEntity<String> generateChequeBookForAccount(long accountNum) {
+		
+		try
+		{
+			LastUsedAccountNum lastAccountNum = lastUsedAccountNumDao.findById();
+			long lastUsedNum = lastAccountNum.getLastUsedValue();
+			lastUsedNum = lastUsedNum+1;
+			System.out.println(lastUsedNum);
+			
+			lastAccountNum.setLastUsedValue(lastUsedNum);
+			lastUsedAccountNumDao.save(lastAccountNum);
+			
+			Account account = accountDao.findByAccountNo(accountNum);
+			account.setChequeBookNumber(lastUsedNum);
+			account.setIsChequeBookAvailable(true);
+			accountDao.save(account);
+			return  OnlineBankingUtils.getResponseEntity("Cheque Book service enabled for this Account",  HttpStatus.OK);
+			
+		}
+		catch(Exception e)
+		{
+				System.out.println("Inside generateChequeBookForAccount()");
+				System.out.println(e);
+		}	
+		return  OnlineBankingUtils.getResponseEntity(OnlineBankingConstants.Something_Went_Wrong,  HttpStatus.INTERNAL_SERVER_ERROR);
+		
+		
+	}
+
+
+
+	@Override
+	public ResponseEntity<String> requestForChequeBook(long accountNum) {
+		try
+		{
+			Account account = accountDao.findByAccountNo(accountNum);
+			account.setIsRequested(true);
+			accountDao.save(account);
+			
+			return  OnlineBankingUtils.getResponseEntity("Cheque book request sent to bank admin, wait for approval",  HttpStatus.OK);
+		}
+		catch(Exception e)
+		{
+			System.out.println("Inside requestForChequeBook()");
+			System.out.println(e);
+		}
+		return  OnlineBankingUtils.getResponseEntity(OnlineBankingConstants.Something_Went_Wrong,  HttpStatus.INTERNAL_SERVER_ERROR);
 		
 	}
 	}

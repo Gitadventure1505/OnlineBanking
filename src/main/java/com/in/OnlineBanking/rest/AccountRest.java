@@ -57,9 +57,29 @@ public interface AccountRest {
 	//public ResponseEntity<Account> getAccountsByMailAndTypeAndIsCheque(@RequestParam("customer_mail") String customer_mail, @RequestParam("account_type") String account_type, @RequestParam("i") String customer_mail );
 	
 	
+	//Get Accounts requested for chequebooks
 	@GetMapping(path = "/getAccountsByIsRequested")
 	public ResponseEntity<List<Account>> getAccountsByIsRequested();
 	
+	
+	//Generate new Chequebook
+	@GetMapping(path = "/generateChequeBookForAccount")
+	public ResponseEntity<String> generateChequeBookForAccount(@RequestParam("accountNum")long accountNum);
+	
+	
+	//Request Cheque boook from user
+	@GetMapping(path = "/requestForChequeBook")
+	public ResponseEntity<String> requestForChequeBook(@RequestParam("accountNum")long accountNum);
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
 	
 	
 	
