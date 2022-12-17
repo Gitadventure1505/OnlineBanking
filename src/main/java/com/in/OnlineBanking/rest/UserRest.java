@@ -33,6 +33,7 @@ public interface UserRest
 	@GetMapping(path = "/getNewUsers")
 	public ResponseEntity<List<UserWrapper>> getNewUsers();
 	
+	//get active users including admin
 	@GetMapping(path = "/getExistingUsers")
 	public ResponseEntity<List<UserWrapper>> getExistingUsers();
 	

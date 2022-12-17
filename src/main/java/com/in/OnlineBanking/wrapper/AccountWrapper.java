@@ -20,6 +20,13 @@ public class AccountWrapper {
 	private long account_no;
 	
 	
+	private long balance;
+	
+	
+	private boolean isChequeBookAvailable;
+	
+	private boolean isRequested;
+	
 	
 
 
@@ -28,13 +35,29 @@ public class AccountWrapper {
 	}
 
 
-	public AccountWrapper(Integer id, String account_type, String customer_mail, long account_no) {
+
+
+
+	public AccountWrapper(Integer id, String account_type, String customer_mail, long account_no, long balance,
+			boolean isChequeBookAvailable, boolean isRequested) {
 		super();
 		this.id = id;
 		this.account_type = account_type;
 		this.customer_mail = customer_mail;
 		this.account_no = account_no;
+		this.balance = balance;
+		this.isChequeBookAvailable = isChequeBookAvailable;
+		this.isRequested = isRequested;
 	}
+
+
+
+
+
+
+
+
+
 
 
 	public Integer getId() {
@@ -42,9 +65,13 @@ public class AccountWrapper {
 	}
 
 
+
+
 	public void setId(Integer id) {
 		this.id = id;
 	}
+
+
 
 
 	public String getAccount_type() {
@@ -52,9 +79,13 @@ public class AccountWrapper {
 	}
 
 
+
+
 	public void setAccount_type(String account_type) {
 		this.account_type = account_type;
 	}
+
+
 
 
 	public String getCustomer_mail() {
@@ -62,9 +93,13 @@ public class AccountWrapper {
 	}
 
 
+
+
 	public void setCustomer_mail(String customer_mail) {
 		this.customer_mail = customer_mail;
 	}
+
+
 
 
 	public long getAccount_no() {
@@ -72,12 +107,67 @@ public class AccountWrapper {
 	}
 
 
+
+
 	public void setAccount_no(long account_no) {
 		this.account_no = account_no;
 	}
+
+
+
+
+	public long getBalance() {
+		return balance;
+	}
+
+
+
+
+	public void setBalance(long balance) {
+		this.balance = balance;
+	}
+
+
+
+
+
+
+
+
+	public boolean getIsChequeBookAvailable() {
+		return isChequeBookAvailable;
+	}
+
+
+
+
+
+
+
+
+	public void setIsChequeBookAvailable(boolean isChequeBookAvailable) {
+		this.isChequeBookAvailable = isChequeBookAvailable;
+	}
+
+
+
+
+
+	public boolean isRequested() {
+		return isRequested;
+	}
+
+
+
+
+
+	public void setRequested(boolean isRequested) {
+		this.isRequested = isRequested;
+	}
+
 	
 	
-	
+
 	
 }
 
